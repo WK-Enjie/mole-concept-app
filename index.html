@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mole Master | Professional Edition</title>
+    <title>Mole Master | Pro</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -13,7 +13,7 @@
         <div class="header-main">
             <div class="logo-area">
                 <h1>🧪 Mole Master</h1>
-                <p>Dynamic Chemistry Engine</p>
+                <p>Adaptive Chemistry Engine</p>
             </div>
             <div class="score-display">
                 <div class="stat-item">Points: <span id="points">0</span></div>
@@ -41,30 +41,27 @@
         <section id="practice" class="panel">
             <div class="practice-bar">
                 <div class="streak-pill">Streak: <span id="streak">0</span></div>
-                <h2 id="topic-header">Select a topic</h2>
+                <h2>Mixed Concept Practice</h2>
             </div>
-            <div id="question-box" class="question-box">
-                <p class="guide-text">Pick a concept from the Learning Hub to generate randomized problems.</p>
+            <div id="random-question-box" class="question-box">
+                <p>Click the button below to generate a random challenge from any difficulty level.</p>
+                <button class="btn-cta" onclick="generateMegaRandomQuestion()">Generate Random Challenge</button>
             </div>
         </section>
 
         <section id="worksheets" class="panel">
-            <div class="import-area">
-                <h2>Load Custom Quiz</h2>
-                <p>Enter the name of your JSON file stored in the <code>/worksheets</code> folder.</p>
-                <div class="import-flex">
-                    <input type="text" id="quiz-input" placeholder="e.g. molarity_test">
-                    <button class="btn-cta" onclick="fetchQuizJSON()">Start Quiz</button>
+            <div class="quiz-layout-wrapper">
+                <div class="import-area">
+                    <h2>Load Custom Quiz</h2>
+                    <div class="import-flex">
+                        <input type="text" id="quiz-input" placeholder="Enter filename (e.g., unit1_test)">
+                        <button class="btn-cta" onclick="fetchQuizJSON()">Start Quiz</button>
+                    </div>
+                    <p id="quiz-status"></p>
                 </div>
-                <p id="quiz-status"></p>
-            </div>
-            
-            <div id="active-quiz-area" class="question-box" style="display:none;">
-                </div>
-
-            <div class="library-container">
-                <h3>Quiz History</h3>
-                <div id="lib-grid" class="topic-grid"></div>
+                
+                <div id="active-quiz-area" class="question-box" style="display:none;">
+                    </div>
             </div>
         </section>
     </main>
