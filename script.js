@@ -1,148 +1,122 @@
-// ==========================================
-// 1. DATA & CONSTANTS
-// ==========================================
+/* =========================================
+   1. CONSTANTS & DATA
+   ========================================= */
 const CHEMICALS = [
-    { name: "NaOH", mr: 40 }, { name: "HCl", mr: 36.5 },
-    { name: "H₂SO₄", mr: 98 }, { name: "CaCO₃", mr: 100 },
-    { name: "MgO", mr: 40 }, { name: "NaCl", mr: 58.5 },
-    { name: "CO₂", mr: 44 }, { name: "H₂O", mr: 18 },
-    { name: "NH₃", mr: 17 }, { name: "KOH", mr: 56 }
+    { name: "NaOH", mr: 40 }, { name: "H₂SO₄", mr: 98 }, { name: "CaCO₃", mr: 100 },
+    { name: "HCl", mr: 36.5 }, { name: "CO₂", mr: 44 }, { name: "MgO", mr: 40 },
+    { name: "H₂O", mr: 18 }, { name: "NH₃", mr: 17 }, { name: "Fe₂O₃", mr: 160 }
 ];
 
 const TOPICS = [
-    { id: 'mass', title: 'Moles & Mass', desc: 'Convert mass to moles', formula: 'n = m / Mr' },
-    { id: 'gas', title: 'Gas Volumes', desc: 'RTP conversions', formula: 'n = V / 24' },
-    { id: 'conc', title: 'Concentration', desc: 'Moles in solution', formula: 'n = c × V' },
-    { id: 'limit', title: 'Limiting Reagent', desc: 'Reactant ratios', formula: 'Compare moles' },
-    { id: 'yield', title: '% Yield & Purity', desc: 'Efficiency calcs', formula: 'Act / Theo' },
-    { id: 'empirical', title: 'Empirical Formula', desc: 'Simplest ratio', formula: 'Divide by smallest' },
-    { id: 'titration', title: 'Titration', desc: 'Neutralization', formula: 'c₁V₁ = c₂V₂' },
-    { id: 'stoich', title: 'Stoichiometry', desc: 'Mole ratios', formula: 'Coefficients' }
+    { id: 'mass', title: 'Moles & Mass', desc: 'm = n × Mr conversions' },
+    { id: 'gas', title: 'Gas Volumes', desc: 'RTP & STP Calculations' },
+    { id: 'conc', title: 'Concentration', desc: 'c = n / V calculations' },
+    { id: 'limit', title: 'Limiting Reagents', desc: 'Find excess & theoretical yield' },
+    { id: 'yield', title: '% Yield & Purity', desc: 'Efficiency calculations' },
+    { id: 'empirical', title: 'Formulae', desc: 'Empirical & Molecular' },
+    { id: 'titration', title: 'Titration', desc: 'Neutralization c₁V₁ = c₂V₂' },
+    { id: 'ions', title: 'Ions & Stoichiometry', desc: 'Ions in solution & reacting masses' }
 ];
 
-// ==========================================
-// 2. STATE MANAGEMENT
-// ==========================================
-const state = {
+/* =========================================
+   2. STATE
+   ========================================= */
+let state = {
     score: 0,
     streak: 0,
     currentTopic: null,
-    currentQ: null, // { answer: 10, unit: 'g', hint: '...', solution: '...' }
-    qCount: 0,
-    quiz: { data: [], index: 0, score: 0 }
+    currentQ: null,
+    qCount: 0
 };
 
-// ==========================================
-// 3. INITIALIZATION
-// ==========================================
+/* =========================================
+   3. INIT & NAVIGATION
+   ========================================= */
 document.addEventListener('DOMContentLoaded', () => {
-    initApp();
-});
-
-function initApp() {
     renderTopics();
     
-    // Navigation Listeners
-    document.getElementById('nav-learn').onclick = () => switchTab('learn');
+    // Nav Buttons
+    document.getElementById('nav-learn').onclick = () => switchView('view-topics');
     document.getElementById('nav-random').onclick = () => startPractice('random');
-    document.getElementById('nav-quiz').onclick = () => switchTab('quiz');
-    
-    // Practice Controls
-    document.getElementById('btn-exit').onclick = () => switchTab('learn');
+    document.getElementById('nav-quiz').onclick = () => switchView('view-quiz');
+    document.getElementById('btn-exit').onclick = () => switchView('view-topics');
+
+    // Controls
     document.getElementById('btn-submit').onclick = checkAnswer;
     document.getElementById('btn-next').onclick = nextQuestion;
-    document.getElementById('btn-hint').onclick = showHint;
+    document.getElementById('btn-hint').onclick = () => document.getElementById('hint-box').classList.remove('hidden');
     
-    // Input Enter Key
-    document.getElementById('answer-input').addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') checkAnswer();
+    // Enter Key
+    document.getElementById('user-input').addEventListener('keypress', (e) => {
+        if(e.key === 'Enter') checkAnswer();
     });
+});
 
-    // Quiz Controls
-    document.getElementById('btn-load-json').onclick = loadQuizFile;
-    document.getElementById('btn-quiz-submit').onclick = submitQuizAnswer;
-}
-
-// ==========================================
-// 4. NAVIGATION LOGIC
-// ==========================================
-function switchTab(tab) {
-    // Hide all sections
-    document.querySelectorAll('section').forEach(el => el.classList.add('hidden'));
-    document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
-
-    if (tab === 'learn') {
-        document.getElementById('section-learn').classList.remove('hidden');
-        document.getElementById('nav-learn').classList.add('active');
-    } else if (tab === 'practice') {
-        document.getElementById('section-practice').classList.remove('hidden');
-        // Nav highlight depends on if random or specific, handled in startPractice
-    } else if (tab === 'quiz') {
-        document.getElementById('section-quiz').classList.remove('hidden');
-        document.getElementById('nav-quiz').classList.add('active');
-    }
+function switchView(viewId) {
+    document.querySelectorAll('section').forEach(s => s.classList.add('hidden'));
+    document.getElementById(viewId).classList.remove('hidden');
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    
+    if(viewId === 'view-topics') document.getElementById('nav-learn').classList.add('active');
+    if(viewId === 'view-quiz') document.getElementById('nav-quiz').classList.add('active');
 }
 
 function renderTopics() {
     const grid = document.getElementById('topics-grid');
     grid.innerHTML = TOPICS.map(t => `
-        <button class="topic-btn" onclick="startPractice('${t.id}')">
+        <div class="topic-card" onclick="startPractice('${t.id}')">
             <h3>${t.title}</h3>
             <p>${t.desc}</p>
-            <small>${t.formula}</small>
-        </button>
+        </div>
     `).join('');
 }
 
-// ==========================================
-// 5. PRACTICE LOGIC
-// ==========================================
+/* =========================================
+   4. CORE GAMEPLAY
+   ========================================= */
 function startPractice(topicId) {
     state.currentTopic = topicId;
     state.qCount = 0;
     
-    // UI Updates
-    switchTab('practice');
+    switchView('view-practice');
     
-    if (topicId === 'random') {
-        document.getElementById('practice-mode-title').textContent = "Random Practice";
+    if(topicId === 'random') {
+        document.getElementById('topic-title').textContent = "Random Practice";
         document.getElementById('nav-random').classList.add('active');
     } else {
         const t = TOPICS.find(x => x.id === topicId);
-        document.getElementById('practice-mode-title').textContent = t.title;
-        document.getElementById('nav-learn').classList.add('active'); // Keep Learn highlighted for specific topics
+        document.getElementById('topic-title').textContent = t.title;
     }
-
+    
     nextQuestion();
 }
 
 function nextQuestion() {
-    // Determine Topic (Specific or Random)
+    // Determine Topic
     let activeTopic = state.currentTopic;
     if (activeTopic === 'random') {
-        const randIndex = Math.floor(Math.random() * TOPICS.length);
-        activeTopic = TOPICS[randIndex].id;
+        activeTopic = TOPICS[Math.floor(Math.random() * TOPICS.length)].id;
     }
 
-    // Generate Question Data
-    const qData = generateQuestionData(activeTopic);
-    state.currentQ = qData;
+    // Generate Question
+    const q = generateQuestion(activeTopic);
+    state.currentQ = q;
     state.qCount++;
 
     // Update UI
-    document.getElementById('q-counter').textContent = state.qCount;
-    document.getElementById('question-text').innerHTML = qData.text;
-    document.getElementById('unit-label').textContent = qData.unit;
-    document.getElementById('hint-text').textContent = qData.hint;
-    document.getElementById('solution-text').innerHTML = qData.solution;
+    document.getElementById('q-count').textContent = state.qCount;
+    document.getElementById('q-text').innerHTML = q.text;
+    document.getElementById('unit-label').textContent = q.unit;
+    document.getElementById('hint-text').textContent = q.hint;
+    document.getElementById('solution-content').innerHTML = q.solution;
 
-    // Reset Inputs/Feedback
-    document.getElementById('answer-input').value = '';
-    document.getElementById('answer-input').disabled = false;
-    document.getElementById('answer-input').focus();
+    // Reset UI State
+    document.getElementById('user-input').value = '';
+    document.getElementById('user-input').disabled = false;
+    document.getElementById('user-input').focus();
     
     document.getElementById('feedback').classList.add('hidden');
-    document.getElementById('feedback').className = 'feedback hidden'; // reset classes
+    document.getElementById('feedback').className = 'feedback hidden';
     document.getElementById('hint-box').classList.add('hidden');
     document.getElementById('solution-box').classList.add('hidden');
     
@@ -151,254 +125,210 @@ function nextQuestion() {
 }
 
 function checkAnswer() {
-    const input = document.getElementById('answer-input');
+    const input = document.getElementById('user-input');
     const val = parseFloat(input.value);
     
-    if (isNaN(val)) return; // Do nothing if empty
+    if(isNaN(val)) return;
 
     const correct = state.currentQ.answer;
-    const tolerance = Math.max(Math.abs(correct * 0.05), 0.01); // 5% margin
+    // 5% Tolerance
+    const tolerance = Math.max(Math.abs(correct * 0.05), 0.01); 
     const isCorrect = Math.abs(val - correct) <= tolerance;
 
     const fb = document.getElementById('feedback');
     fb.classList.remove('hidden');
 
-    if (isCorrect) {
+    if(isCorrect) {
         state.score += 10 + state.streak;
         state.streak++;
         fb.textContent = `✅ Correct! (+${10 + state.streak} pts)`;
         fb.classList.add('correct');
     } else {
         state.streak = 0;
-        fb.innerHTML = `❌ Incorrect. The answer was <b>${correct.toFixed(3)}</b>`;
-        fb.classList.add('incorrect');
+        fb.innerHTML = `❌ Incorrect. Answer: <b>${correct.toPrecision(4)}</b>`;
+        fb.classList.add('wrong');
     }
 
-    // Update Stats
     document.getElementById('score').textContent = state.score;
     document.getElementById('streak').textContent = state.streak;
-
-    // Show Solution & Enable Next
+    
+    // Show solution
     document.getElementById('solution-box').classList.remove('hidden');
+    input.disabled = true;
     document.getElementById('btn-submit').disabled = true;
-    document.getElementById('answer-input').disabled = true;
     document.getElementById('btn-next').disabled = false;
     document.getElementById('btn-next').focus();
 }
 
-function showHint() {
-    document.getElementById('hint-box').classList.remove('hidden');
-}
+/* =========================================
+   5. QUESTION GENERATOR LOGIC
+   ========================================= */
+const r = (min, max, dec=0) => parseFloat((Math.random() * (max - min) + min).toFixed(dec));
+const randInt = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
+const choice = (arr) => arr[Math.floor(Math.random() * arr.length)];
 
-// ==========================================
-// 6. QUESTION GENERATORS (The Math)
-// ==========================================
-function generateQuestionData(topic) {
-    const r = (min, max, dec=0) => parseFloat((Math.random() * (max - min) + min).toFixed(dec));
-    const chem = CHEMICALS[Math.floor(Math.random() * CHEMICALS.length)];
+function generateQuestion(topic) {
+    const chem = choice(CHEMICALS);
 
     switch(topic) {
         case 'mass':
-            const mass = r(5, 50, 1);
-            const moles = mass / chem.mr;
-            return {
-                text: `Calculate the moles in <b>${mass} g</b> of <b>${chem.name}</b> (Mr = ${chem.mr}).`,
-                answer: moles, unit: 'mol', hint: 'n = m / Mr',
-                solution: `${mass} / ${chem.mr} = <b>${moles.toFixed(3)} mol</b>`
-            };
+            // 3 Variations
+            const subTypeM = randInt(1, 3);
+            if (subTypeM === 1) { // Mass -> Moles
+                const m = r(1, 100, 1);
+                const ans = m / chem.mr;
+                return {
+                    text: `Calculate moles in <b>${m} g</b> of <b>${chem.name}</b> (Mr=${chem.mr}).`,
+                    answer: ans, unit: 'mol', hint: 'n = m / Mr',
+                    solution: `n = ${m} / ${chem.mr} = <b>${ans.toFixed(3)}</b>`
+                };
+            } else if (subTypeM === 2) { // Moles -> Mass
+                const n = r(0.1, 5, 2);
+                const ans = n * chem.mr;
+                return {
+                    text: `Calculate mass of <b>${n} mol</b> of <b>${chem.name}</b>.`,
+                    answer: ans, unit: 'g', hint: 'm = n × Mr',
+                    solution: `m = ${n} × ${chem.mr} = <b>${ans.toFixed(1)}</b>`
+                };
+            } else { // Particles -> Moles
+                const n = r(0.5, 3, 1);
+                const parts = (n * 6.02).toFixed(2);
+                return {
+                    text: `How many moles are in <b>${parts} × 10²³</b> particles?`,
+                    answer: n, unit: 'mol', hint: 'Divide by Avogadro (6.02)',
+                    solution: `${parts} / 6.02 = <b>${n}</b>`
+                };
+            }
+
+        case 'ions': 
+            // 3 Variations: Mass Reacting, Ions from Conc, Precipitate
+            const subTypeI = randInt(1, 3);
+            
+            if (subTypeI === 1) { // IONS IN SOLUTION
+                const salts = [
+                    {f:'MgCl₂', ions: 3, name:'Chloride', ionSymbol:'Cl⁻', nIon:2},
+                    {f:'AlCl₃', ions: 4, name:'Chloride', ionSymbol:'Cl⁻', nIon:3},
+                    {f:'Na₂SO₄', ions: 3, name:'Sodium', ionSymbol:'Na⁺', nIon:2},
+                    {f:'Fe(NO₃)₃', ions: 4, name:'Nitrate', ionSymbol:'NO₃⁻', nIon:3}
+                ];
+                const s = choice(salts);
+                const vol = r(100, 500, 0); // cm3
+                const conc = r(0.1, 2.0, 1); // mol/dm3
+                const molSalt = conc * (vol/1000);
+                const ans = molSalt * s.nIon;
+                
+                return {
+                    text: `Calculate the moles of <b>${s.name} ions (${s.ionSymbol})</b> in <b>${vol} cm³</b> of <b>${conc} mol/dm³ ${s.f}</b>.`,
+                    answer: ans, unit: 'mol ions', 
+                    hint: '1. Find moles of salt (n=cV). 2. Multiply by ion ratio.',
+                    solution: `n(${s.f}) = ${conc} × (${vol}/1000) = ${molSalt.toFixed(3)} mol.<br>Ratio is 1:${s.nIon}.<br>n(ions) = ${molSalt.toFixed(3)} × ${s.nIon} = <b>${ans.toFixed(3)}</b>`
+                };
+            } 
+            else if (subTypeI === 2) { // PRECIPITATE REACTION
+                // Pb2+ + 2I- -> PbI2
+                const volPb = r(20, 100, 0);
+                const concPb = r(0.1, 0.5, 2);
+                const molPb = (volPb/1000) * concPb;
+                // Assume excess Iodide
+                const ans = molPb * 461; // Mr PbI2 = 461
+                
+                return {
+                    text: `<b>Pb(NO₃)₂ + 2KI → PbI₂ + 2KNO₃</b><br>Excess KI is added to <b>${volPb} cm³</b> of <b>${concPb} M Pb(NO₃)₂</b>.<br>Calculate mass of precipitate (Mr PbI₂ = 461).`,
+                    answer: ans, unit: 'g',
+                    hint: '1. Find moles Pb(NO₃)₂. 2. Ratio 1:1 to PbI₂. 3. Mass.',
+                    solution: `n(Pb) = ${concPb} × (${volPb}/1000) = ${molPb} mol.<br>m = ${molPb} × 461 = <b>${ans.toFixed(2)}</b>`
+                };
+            } 
+            else { // REACTING MASSES
+                 // 2Mg + O2 -> 2MgO
+                 const massMg = r(10, 50, 1);
+                 const molMg = massMg / 24.3;
+                 const ans = molMg * 40.3; // MgO
+                 return {
+                     text: `<b>2Mg + O₂ → 2MgO</b>.<br>Calculate mass of MgO produced from <b>${massMg} g</b> of Mg.<br>(Ar: Mg=24.3, O=16)`,
+                     answer: ans, unit: 'g', hint: 'Mass -> Moles -> Ratio -> Mass',
+                     solution: `n(Mg) = ${massMg}/24.3 = ${molMg.toFixed(2)} mol.<br>1:1 ratio.<br>m = ${molMg.toFixed(2)} × 40.3 = <b>${ans.toFixed(2)}</b>`
+                 };
+            }
+
         case 'gas':
-            const vol = r(12, 96, 1);
-            const gasMol = vol / 24;
-            return {
-                text: `Calculate the moles in <b>${vol} dm³</b> of gas at RTP.`,
-                answer: gasMol, unit: 'mol', hint: 'n = V / 24',
-                solution: `${vol} / 24 = <b>${gasMol.toFixed(3)} mol</b>`
-            };
+            const subTypeG = randInt(1, 2);
+            if(subTypeG === 1) {
+                const v = r(12, 100, 1);
+                return {
+                    text: `Moles in <b>${v} dm³</b> gas at RTP?`,
+                    answer: v/24, unit: 'mol', hint: 'n = V/24',
+                    solution: `${v}/24 = <b>${(v/24).toFixed(3)}</b>`
+                };
+            } else {
+                const m = r(10, 100, 0); // mass
+                const gas = choice([{n:'CO₂', mr:44}, {n:'O₂', mr:32}, {n:'N₂', mr:28}]);
+                const mol = m / gas.mr;
+                const ans = mol * 24;
+                return {
+                    text: `Volume of <b>${m} g</b> of <b>${gas.n}</b> at RTP?`,
+                    answer: ans, unit: 'dm³', hint: 'Find moles first, then V = n × 24',
+                    solution: `n = ${m}/${gas.mr} = ${mol.toFixed(2)}.<br>V = ${mol.toFixed(2)} × 24 = <b>${ans.toFixed(2)}</b>`
+                };
+            }
+
         case 'conc':
             const c = r(0.1, 2.0, 2);
-            const v = r(25, 250, 0); // cm3
-            const nSol = c * (v/1000);
+            const v = r(25, 500, 0);
             return {
-                text: `Calculate moles in <b>${v} cm³</b> of <b>${c} mol/dm³</b> solution.`,
-                answer: nSol, unit: 'mol', hint: 'n = c × (V/1000)',
-                solution: `${c} × (${v}/1000) = <b>${nSol.toFixed(4)} mol</b>`
+                text: `Moles in <b>${v} cm³</b> of <b>${c} mol/dm³</b> solution?`,
+                answer: c * (v/1000), unit: 'mol', hint: 'n = c × (V/1000)',
+                solution: `${c} × (${v}/1000) = <b>${(c*(v/1000)).toFixed(4)}</b>`
             };
+
         case 'limit':
-            // Simple: 2A + B -> C. (Ratio 2:1)
-            const mA = r(1,5,1); const mB = r(1,5,1);
-            const neededB = mA / 2;
-            const isALimiting = mB > neededB; // If have enough B, A is limit
-            // Question: How much B remains? (or A if B is limit)
-            // Let's stick to: "How many moles of excess reactant remain?"
-            let excessMol;
-            if (isALimiting) {
-                // A limits. B is excess. Used B = mA/2.
-                excessMol = mB - (mA/2);
-            } else {
-                // B limits. A is excess. Used A = mB*2.
-                excessMol = mA - (mB*2);
-            }
+            // 2H2 + O2 -> 2H2O
+            const h2 = r(2, 10, 1);
+            const o2 = r(1, 10, 1);
+            const neededO2 = h2 / 2;
+            const excess = o2 > neededO2 ? (o2 - neededO2) : (h2 - (o2*2));
+            const isO2Limit = o2 < neededO2;
+            const leftover = isO2Limit ? 'H₂' : 'O₂';
             return {
-                text: `Reaction: <b>2A + B → C</b>.<br>You have <b>${mA} mol A</b> and <b>${mB} mol B</b>.<br>Calculate moles of excess reactant remaining.`,
-                answer: excessMol, unit: 'mol', hint: 'Determine limiting first (Ratio 2:1)',
-                solution: `Limiting is ${isALimiting ? 'A' : 'B'}. Excess = <b>${excessMol.toFixed(2)} mol</b>`
+                text: `<b>2H₂ + O₂ → 2H₂O</b><br>Reacting <b>${h2} mol H₂</b> with <b>${o2} mol O₂</b>.<br>Calculate moles of excess reactant remaining.`,
+                answer: Math.max(0, excess), unit: 'mol', 
+                hint: 'Ratio is 2:1. Check which runs out first.',
+                solution: `${isO2Limit ? 'O₂' : 'H₂'} limits.<br>Remaining ${leftover} = <b>${excess.toFixed(2)}</b>`
             };
+
         case 'yield':
-            const theo = r(10, 50, 1);
+            const theo = r(20, 100, 1);
             const act = r(theo*0.5, theo*0.9, 1);
-            const yieldVal = (act/theo)*100;
             return {
-                text: `Theoretical Yield: <b>${theo} g</b>.<br>Actual Yield: <b>${act} g</b>.<br>Calculate % Yield.`,
-                answer: yieldVal, unit: '%', hint: '(Actual/Theo) * 100',
-                solution: `(${act}/${theo}) × 100 = <b>${yieldVal.toFixed(1)}%</b>`
+                text: `Theoretical: <b>${theo}g</b>. Actual: <b>${act}g</b>.<br>Calculate % Yield.`,
+                answer: (act/theo)*100, unit: '%', hint: '(Actual/Theo) * 100',
+                solution: `${act}/${theo} * 100 = <b>${((act/theo)*100).toFixed(1)}</b>`
             };
-        case 'empirical':
-            // Reverse engineer: CHx
-            const x = Math.floor(Math.random()*3)+1; // 1 to 3
-            const mrE = 12 + x;
-            const pC = (12/mrE)*100;
-            const pH = (x/mrE)*100;
-            return {
-                text: `Hydrocarbon: <b>${pC.toFixed(1)}% C</b> and <b>${pH.toFixed(1)}% H</b>.<br>Find <b>x</b> in CHₓ.`,
-                answer: x, unit: '', hint: 'Divide % by Ar (C=12, H=1)',
-                solution: `Ratio C:H is 1:${x}. x = <b>${x}</b>`
-            };
+            
         case 'titration':
             // c1v1 = c2v2
-            const c1 = r(0.1, 0.5, 2); const v1 = r(20, 30, 1); const v2 = r(20, 35, 1);
+            const c1 = r(0.1, 1.0, 2);
+            const v1 = r(20, 50, 1);
+            const v2 = r(20, 50, 1);
             const c2 = (c1*v1)/v2;
             return {
-                text: `<b>${v1} cm³</b> of <b>${c1} M HCl</b> neutralizes <b>${v2} cm³</b> NaOH.<br>Find [NaOH].`,
+                text: `<b>${v1} cm³</b> of <b>${c1} M HCl</b> neutralizes <b>${v2} cm³</b> NaOH.<br>Calculate [NaOH].`,
                 answer: c2, unit: 'mol/dm³', hint: 'c₁V₁ = c₂V₂',
-                solution: `(${c1}×${v1}) / ${v2} = <b>${c2.toFixed(3)} M</b>`
+                solution: `(${c1}×${v1}) / ${v2} = <b>${c2.toFixed(3)}</b>`
             };
-        case 'stoich':
-            // N2 + 3H2 -> 2NH3. 
-            const nN2 = r(0.5, 3, 1);
-            const nNH3 = nN2 * 2;
+            
+        case 'empirical':
+            const x = randInt(1, 4);
+            const mr = 12 + x;
+            const pc = (12/mr)*100;
+            const ph = (x/mr)*100;
             return {
-                text: `Reaction: <b>N₂ + 3H₂ → 2NH₃</b>.<br>If <b>${nN2} mol N₂</b> reacts, how much NH₃ forms?`,
-                answer: nNH3, unit: 'mol', hint: 'Mole ratio 1:2',
-                solution: `${nN2} × 2 = <b>${nNH3.toFixed(1)} mol</b>`
+                text: `Hydrocarbon: <b>${pc.toFixed(1)}% C</b>, <b>${ph.toFixed(1)}% H</b>.<br>Find <b>x</b> in CHₓ.`,
+                answer: x, unit: '', hint: 'Divide % by Ar (C=12, H=1)',
+                solution: `Ratio 1:${x}. x = <b>${x}</b>`
             };
+
         default:
-            return { text: 'Error', answer: 0, unit: '', hint: '', solution: '' };
+             return { text: "Error", answer: 0 };
     }
-}
-
-// ==========================================
-// 7. QUIZ LOGIC
-// ==========================================
-async function loadQuizFile() {
-    const filename = document.getElementById('quiz-filename').value;
-    const status = document.getElementById('quiz-status');
-    const ui = document.getElementById('quiz-interface');
-
-    if (!filename) {
-        status.textContent = "⚠️ Please enter a filename.";
-        status.style.color = "orange";
-        return;
-    }
-
-    try {
-        // Attempt fetch
-        const response = await fetch(`./worksheets/${filename}.json`);
-        
-        if (!response.ok) throw new Error("File not found or CORS error (use Live Server)");
-        
-        const data = await response.json();
-        state.quiz.data = data.questions || [];
-        
-        if (state.quiz.data.length === 0) throw new Error("No questions in file");
-
-        // Success
-        status.textContent = `✅ Loaded ${state.quiz.data.length} questions.`;
-        status.style.color = "#4ade80"; // Green
-        ui.classList.remove('hidden');
-        
-        startQuiz();
-
-    } catch (err) {
-        status.innerHTML = `❌ Error: ${err.message}<br><small>Note: For local files, open this folder in VS Code and use "Live Server".</small>`;
-        status.style.color = "#ef4444"; // Red
-        ui.classList.add('hidden');
-    }
-}
-
-function startQuiz() {
-    state.quiz.index = 0;
-    state.quiz.score = 0;
-    renderQuizQuestion();
-}
-
-function renderQuizQuestion() {
-    const q = state.quiz.data[state.quiz.index];
-    const total = state.quiz.data.length;
-    
-    document.getElementById('quiz-q-num').textContent = state.quiz.index + 1;
-    document.getElementById('quiz-total').textContent = total;
-    
-    // Progress bar
-    const pct = ((state.quiz.index) / total) * 100;
-    document.getElementById('quiz-progress-fill').style.width = pct + "%";
-
-    document.getElementById('quiz-q-text').textContent = q.question;
-    document.getElementById('quiz-unit').textContent = q.unit || '';
-    
-    // Reset inputs
-    document.getElementById('quiz-input').value = '';
-    document.getElementById('quiz-input').disabled = false;
-    document.getElementById('quiz-feedback').classList.add('hidden');
-    
-    const btn = document.getElementById('btn-quiz-submit');
-    btn.textContent = "Submit";
-    btn.disabled = false;
-}
-
-function submitQuizAnswer() {
-    const input = document.getElementById('quiz-input');
-    const val = parseFloat(input.value);
-    
-    if (isNaN(val)) return;
-
-    const currentQ = state.quiz.data[state.quiz.index];
-    const correct = parseFloat(currentQ.answer);
-    const isCorrect = Math.abs(val - correct) <= (correct * 0.05 + 0.01);
-
-    const fb = document.getElementById('quiz-feedback');
-    fb.classList.remove('hidden');
-    
-    if (isCorrect) {
-        fb.textContent = "✅ Correct";
-        fb.className = "feedback correct";
-        state.quiz.score++;
-    } else {
-        fb.textContent = `❌ Incorrect (Ans: ${correct})`;
-        fb.className = "feedback incorrect";
-    }
-
-    document.getElementById('btn-quiz-submit').disabled = true;
-    input.disabled = true;
-
-    // Next question delay
-    setTimeout(() => {
-        state.quiz.index++;
-        if (state.quiz.index < state.quiz.data.length) {
-            renderQuizQuestion();
-        } else {
-            finishQuiz();
-        }
-    }, 1500);
-}
-
-function finishQuiz() {
-    const ui = document.getElementById('quiz-interface');
-    ui.innerHTML = `
-        <div style="text-align:center; padding: 20px;">
-            <h3>Quiz Complete!</h3>
-            <p style="font-size: 1.5rem; margin: 15px 0;">Score: ${state.quiz.score} / ${state.quiz.data.length}</p>
-            <button class="btn-primary" onclick="location.reload()">Return to Menu</button>
-        </div>
-    `;
-    document.getElementById('quiz-progress-fill').style.width = "100%";
 }
