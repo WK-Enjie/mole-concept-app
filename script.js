@@ -1,143 +1,129 @@
-/**
- * MOLE MASTER - ADVANCED STOICHIOMETRY
- */
-
-const TOPICS = {
-    basic: [{ id: 'm-mr', title: 'Mass & Mr', desc: 'n = m / Mr' }, { id: 'gas', title: 'Gas Volume', desc: 'n = V / 24' }],
-    intermediate: [{ id: 'yield', title: '% Yield', desc: 'Actual vs Theo' }, { id: 'emp', title: 'Empirical', desc: 'Simplest ratio' }],
+const DATA = {
+    basic: [
+        { id: 'mass', title: 'Mass & Mr', formula: 'n = m / Mr' },
+        { id: 'gas', title: 'Gas Volume', formula: 'n = V / 24' }
+    ],
+    intermediate: [
+        { id: 'yield', title: 'Yield %', formula: 'Act/Theo x 100' },
+        { id: 'emp', title: 'Empirical', formula: 'Simplest Ratio' }
+    ],
     advanced: [
-        { id: 'titration', title: 'Titration', desc: 'Acid-Base neutralisation' },
-        { id: 'redox', title: 'Redox States', desc: 'Oxidation numbers' },
-        { id: 'ions', title: 'Ion Molarity', desc: 'Salt dissociation' }
+        { id: 'titrate', title: 'Titration', formula: 'C1V1 = C2V2' },
+        { id: 'redox', title: 'Redox', formula: 'Oxidation States' }
     ]
 };
 
-let currentTier = 'advanced', currentAnswer = null, stats = { pts: 0, count: 0, correct: 0 };
-let quizQs = [], quizIdx = 0;
+let currentTier = 'basic';
+let activeAns = null;
+let stats = { pts: 0, tries: 0, hits: 0, streak: 0 };
+let quizList = [], quizStep = 0;
 
-function navigate(e, id) {
+function showPanel(e, id) {
     document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-    document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
     document.getElementById(id).classList.add('active');
-    if(e) e.currentTarget.classList.add('active');
+    if(e) e.target.classList.add('active');
+    if(id === 'learn-section') updateTier(currentTier);
 }
 
-function setTier(t) {
+function updateTier(t) {
     currentTier = t;
-    document.querySelectorAll('.tier-link').forEach(b => b.classList.remove('active'));
-    event.currentTarget.classList.add('active');
-    renderGrid();
-}
-
-function renderGrid() {
-    const grid = document.getElementById('topic-grid');
-    grid.innerHTML = TOPICS[currentTier].map(t => `
-        <div class="topic-card">
-            <h3>${t.title}</h3>
-            <p>${t.desc}</p>
-            <button class="btn-cta" onclick="startLearn('${t.id}')">Practice</button>
+    document.querySelectorAll('.tier-link').forEach(l => l.classList.remove('active'));
+    event.target.classList.add('active');
+    
+    const grid = document.getElementById('learning-grid');
+    grid.innerHTML = DATA[t].map(item => `
+        <div class="interactive-card">
+            <h3>${item.title}</h3>
+            <p>${item.formula}</p>
+            <button class="btn-primary" onclick="startTask('${item.id}')">Practice</button>
         </div>
     `).join('');
 }
 
-// LOGIC GENERATOR
-function generateLogic(id, target) {
-    const box = document.getElementById(target);
-    let q = "", u = "", type = "number";
+function startTask(id) {
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    document.getElementById('practice-section').classList.add('active');
+    generateLogic(id);
+}
 
-    if (id === 'titration') {
-        const v1 = 25; const c1 = (Math.random() * 0.2 + 0.1).toFixed(2);
-        const v2 = (Math.random() * 10 + 20).toFixed(1);
-        q = `In a titration, <b>${v1}cm³</b> of <b>${c1}M HCl</b> neutralises <b>${v2}cm³</b> of NaOH. Find the concentration of NaOH.`;
-        currentAnswer = ((c1 * v1) / v2).toFixed(3); u = "M";
-    } 
-    else if (id === 'redox') {
-        const species = [
-            { f: "KMnO₄", el: "Mn", a: "+7" }, { f: "K₂Cr₂O₇", el: "Cr", a: "+6" },
-            { f: "SO₄²⁻", el: "S", a: "+6" }, { f: "ClO₃⁻", el: "Cl", a: "+5" }
-        ];
-        const s = species[Math.floor(Math.random()*species.length)];
-        q = `What is the oxidation state of <b>${s.el}</b> in <b>${s.f}</b>? (Include + or -)`;
-        currentAnswer = s.a; type = "text";
-    }
-    else {
-        q = "Find moles in 10g of NaOH (Mr=40)";
-        currentAnswer = "0.25"; u = "mol";
+function generateRandomTask() {
+    const keys = ['mass', 'gas', 'titrate', 'redox'];
+    generateLogic(keys[Math.floor(Math.random()*keys.length)]);
+}
+
+
+function generateLogic(id) {
+    const box = document.getElementById('practice-box');
+    let q = "", unit = "", isText = false;
+
+    if(id === 'titrate') {
+        const v1 = 25, c1 = 0.1, v2 = (Math.random()*10 + 20).toFixed(1);
+        q = `25cm³ of 0.1M HCl neutralizes ${v2}cm³ of NaOH. Calculate [NaOH].`;
+        activeAns = (2.5 / v2).toFixed(3); unit = "M";
+    } else if(id === 'redox') {
+        const ions = [{n:'MnO₄⁻', e:'Mn', a:'+7'}, {n:'Cr₂O₇²⁻', e:'Cr', a:'+6'}];
+        const choice = ions[Math.floor(Math.random()*ions.length)];
+        q = `What is the oxidation state of ${choice.e} in ${choice.n}?`;
+        activeAns = choice.a; isText = true;
+    } else {
+        const m = (Math.random()*10 + 2).toFixed(1);
+        q = `Calculate moles in ${m}g of NaOH (Mr=40).`;
+        activeAns = (m/40).toFixed(2); unit = "mol";
     }
 
     box.innerHTML = `<h3>${q}</h3>
-        <div class="input-row"><input type="${type}" id="ans-inp"><span style="color:#a855f7">${u}</span></div>
-        <div id="fb" style="margin-bottom:10px; height:20px;"></div>
-        <button class="btn-cta" onclick="checkAns('${target}', '${id}')">Submit</button>`;
-}
-
-function startLearn(id) {
-    navigate(null, 'practice');
-    generateLogic(id, 'random-question-box');
-}
-
-function generateMegaRandomQuestion() {
-    const ids = ['titration', 'redox', 'ions', 'm-mr', 'gas'];
-    const r = ids[Math.floor(Math.random()*ids.length)];
-    generateLogic(r, 'random-question-box');
+        <input type="${isText?'text':'number'}" id="u-ans" class="input-field" placeholder="Answer...">
+        <div id="fb"></div>
+        <button class="btn-primary" onclick="checkAns('${id}')">Check Answer</button>`;
 }
 
 
-
-function checkAns(boxId, id) {
-    const user = document.getElementById('ans-inp').value.trim();
-    const fb = document.getElementById('fb');
-    let correct = false;
-
-    if(isNaN(currentAnswer)) {
-        correct = (user.toLowerCase() === currentAnswer.toLowerCase());
+function checkAns(id) {
+    const val = document.getElementById('u-ans').value.trim();
+    const isCorrect = (val == activeAns || Math.abs(val - activeAns) < 0.02);
+    
+    stats.tries++;
+    if(isCorrect) {
+        stats.pts += 10; stats.hits++; stats.streak++;
+        document.getElementById('fb').innerHTML = "✅ Correct!";
+        setTimeout(() => generateLogic(id), 1200);
     } else {
-        correct = (Math.abs(parseFloat(user) - parseFloat(currentAnswer)) < 0.01);
+        stats.streak = 0;
+        document.getElementById('fb').innerHTML = `❌ Wrong. Ans: ${activeAns}`;
     }
-
-    if(correct) {
-        fb.innerHTML = "<span style='color:#22c55e'>Correct!</span>";
-        stats.pts += 10; stats.correct++;
-        setTimeout(() => generateLogic(id, boxId), 1500);
-    } else {
-        fb.innerHTML = `<span style='color:#ef4444'>Incorrect. Answer: ${currentAnswer}</span>`;
-    }
-    stats.count++;
     updateUI();
 }
 
 function updateUI() {
     document.getElementById('points').innerText = stats.pts;
-    const acc = stats.count > 0 ? Math.round((stats.correct/stats.count)*100) : 0;
+    document.getElementById('streak').innerText = stats.streak;
+    const acc = stats.tries ? Math.round((stats.hits/stats.tries)*100) : 0;
     document.getElementById('accuracy').innerText = acc + "%";
 }
 
 // QUIZ LOADER
-async function fetchQuizJSON() {
-    const file = document.getElementById('quiz-input').value;
-    const status = document.getElementById('quiz-status');
+async function loadQuizFile() {
+    const file = document.getElementById('quiz-file').value;
     try {
         const res = await fetch(`./worksheets/${file}.json`);
         const data = await res.json();
-        quizQs = data.questions; quizIdx = 0;
-        status.innerText = "✅ Quiz Ready!";
-        renderQuiz();
-    } catch(e) { status.innerText = "❌ File not found!"; }
+        quizList = data.questions; quizStep = 0;
+        runQuiz();
+    } catch(e) { document.getElementById('quiz-msg').innerText = "Not found."; }
 }
 
-function renderQuiz() {
-    const area = document.getElementById('active-quiz-area');
-    area.style.display = 'block';
-    const q = quizQs[quizIdx];
-    area.innerHTML = `<h3>Quiz: Question ${quizIdx + 1}</h3><p style="margin:15px 0">${q.question}</p>
-        <div class="input-row"><input id="q-ans"></div>
-        <button class="btn-cta" onclick="nextQuiz()">Next</button>`;
+function runQuiz() {
+    const box = document.getElementById('active-quiz-area');
+    box.style.display = 'block';
+    const q = quizList[quizStep];
+    box.innerHTML = `<h3>Q${quizStep+1}: ${q.question}</h3>
+        <input id="q-ans" class="input-field">
+        <button class="btn-primary" onclick="nextQuiz()">Submit</button>`;
 }
 
 function nextQuiz() {
-    quizIdx++;
-    if(quizIdx < quizQs.length) renderQuiz();
-    else document.getElementById('active-quiz-area').innerHTML = "<h2>Quiz Finished!</h2>";
+    quizStep++;
+    if(quizStep < quizList.length) runQuiz();
+    else document.getElementById('active-quiz-area').innerHTML = "<h2>Finished!</h2>";
 }
-
-renderGrid();
