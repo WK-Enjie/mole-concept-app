@@ -1,32 +1,26 @@
 * { margin: 0; padding: 0; box-sizing: border-box; }
-body { font-family: 'Segoe UI', Arial, sans-serif; background: #1a1a2e; color: #eee; min-height: 100vh; }
+body { font-family: 'Segoe UI', sans-serif; background: #1a1a2e; color: #eee; }
 .app { max-width: 900px; margin: 0 auto; padding: 20px; }
-
-/* Header & Navigation */
-.header { background: linear-gradient(135deg, #667eea, #764ba2); padding: 20px; border-radius: 10px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
-.score-box { background: rgba(255,255,255,0.2); padding: 10px 20px; border-radius: 20px; font-weight: bold; }
-.tabs { display: flex; gap: 5px; margin-bottom: 20px; }
-.tab { flex: 1; padding: 15px; background: #2d2d44; border: none; color: #aaa; cursor: pointer; border-radius: 8px; transition: 0.3s; }
+.header { background: linear-gradient(135deg, #667eea, #764ba2); padding: 20px; border-radius: 10px; display: flex; justify-content: space-between; margin-bottom: 20px; }
+.tabs { display: flex; gap: 10px; margin-bottom: 20px; }
+.tab { flex: 1; padding: 15px; background: #2d2d44; border: none; color: #aaa; border-radius: 8px; cursor: pointer; }
 .tab.active { background: #667eea; color: white; }
-
-/* Panels */
 .panel { display: none; background: #2d2d44; padding: 25px; border-radius: 10px; }
 .panel.active { display: block; }
-
-/* Question UI */
-.question-box { background: #3d3d5c; padding: 25px; border-radius: 10px; }
-.q-text { font-size: 1.2rem; margin-bottom: 20px; }
-.answer-row { display: flex; gap: 10px; margin-bottom: 15px; }
-.answer-row input { flex: 1; padding: 12px; border-radius: 8px; border: 2px solid #555; background: #1a1a2e; color: white; }
-
-/* Custom/Worksheet Section */
-.custom-sections { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
-.upload-area { border: 2px dashed #555; padding: 30px; text-align: center; border-radius: 10px; cursor: pointer; }
-.upload-area.dragover { border-color: #667eea; background: rgba(102,126,234,0.1); }
-.url-section input { width: 100%; padding: 10px; margin-bottom: 10px; border-radius: 5px; border: 1px solid #555; background: #2d2d44; color: white; }
-
-/* Modals */
-.modal { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); display:none; align-items:center; justify-content:center; }
+.level-btns { display: flex; gap: 10px; margin-bottom: 20px; }
+.lvl-btn { padding: 10px 20px; background: #3d3d5c; border: 2px solid #555; border-radius: 8px; color: #eee; cursor: pointer; }
+.lvl-btn.active { border-color: #667eea; background: rgba(102,126,234,0.1); }
+.topic-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
+.topic-card { background: #3d3d5c; padding: 20px; border-radius: 10px; cursor: pointer; border: 2px solid transparent; transition: 0.3s; }
+.topic-card:hover { border-color: #667eea; }
+.question-box { background: #3d3d5c; padding: 30px; border-radius: 10px; }
+.answer-row { display: flex; gap: 10px; margin: 20px 0; }
+.answer-row input { flex: 1; padding: 12px; background: #1a1a2e; border: 1px solid #555; color: white; border-radius: 5px; }
+.feedback-box { padding: 15px; border-radius: 5px; display: none; margin-bottom: 10px; }
+.feedback-box.correct { display: block; background: rgba(34, 197, 94, 0.2); color: #22c55e; }
+.feedback-box.wrong { display: block; background: rgba(239, 68, 68, 0.2); color: #fca5a5; }
+.btn-primary { background: #667eea; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; }
+.modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: none; align-items: center; justify-content: center; }
 .modal.show { display: flex; }
-.modal-content { background:#2d2d44; padding:30px; border-radius:10px; max-width:600px; width:90%; position:relative; }
-.close-btn { position:absolute; right:20px; top:10px; font-size:2rem; cursor:pointer; }
+.modal-content { background: #2d2d44; padding: 30px; border-radius: 10px; width: 90%; max-width: 600px; position: relative; }
+.close-btn { position: absolute; right: 20px; top: 10px; font-size: 24px; cursor: pointer; }
