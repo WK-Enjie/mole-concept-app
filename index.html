@@ -25,7 +25,7 @@
     <nav class="tab-navigation">
         <button class="nav-tab active" onclick="navigate(event, 'learn')">Learning Hub</button>
         <button class="nav-tab" onclick="navigate(event, 'practice')">Randomized Practice</button>
-        <button class="nav-tab" onclick="navigate(event, 'worksheets')">GitHub Worksheets</button>
+        <button class="nav-tab" onclick="navigate(event, 'worksheets')">Quiz Mode</button>
     </nav>
 
     <main class="viewport">
@@ -50,15 +50,20 @@
 
         <section id="worksheets" class="panel">
             <div class="import-area">
-                <h2>Import from /worksheets subfolder</h2>
+                <h2>Load Custom Quiz</h2>
+                <p>Enter the name of your JSON file stored in the <code>/worksheets</code> folder.</p>
                 <div class="import-flex">
-                    <input type="text" id="gh-input" placeholder="filename.json (e.g. mock_exam)">
-                    <button class="btn-cta" onclick="fetchJSON()">Load Worksheet</button>
+                    <input type="text" id="quiz-input" placeholder="e.g. molarity_test">
+                    <button class="btn-cta" onclick="fetchQuizJSON()">Start Quiz</button>
                 </div>
-                <p id="gh-status"></p>
+                <p id="quiz-status"></p>
             </div>
+            
+            <div id="active-quiz-area" class="question-box" style="display:none;">
+                </div>
+
             <div class="library-container">
-                <h3>Local Library</h3>
+                <h3>Quiz History</h3>
                 <div id="lib-grid" class="topic-grid"></div>
             </div>
         </section>
