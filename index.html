@@ -3,195 +3,70 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mole Calculator</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>Mole Calculations Master</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <div class="app">
-        <!-- HEADER -->
-        <div class="header">
-            <h1>🧪 Mole Calculations Master</h1>
-            <div class="score-box">Score: <span id="score">0</span> | Streak: <span id="streak">0</span> 🔥</div>
-        </div>
-
-        <!-- TABS -->
-        <div class="tabs">
-            <button class="tab active" onclick="openTab('learn')">📚 Learn</button>
-            <button class="tab" onclick="openTab('practice')">✏️ Practice</button>
-            <button class="tab" onclick="openTab('test')">📝 Test</button>
-            <button class="tab" onclick="openTab('custom')">📁 Custom</button>
-        </div>
-
-        <!-- LEARN TAB -->
-        <div id="learn" class="panel active">
-            <h2>📚 Learning Center</h2>
-            <p>Select a difficulty level and topic to start learning</p>
-            
-            <div class="level-btns">
-                <button class="lvl-btn basic active" onclick="setLearnLevel('basic')">🌱 Basic</button>
-                <button class="lvl-btn inter" onclick="setLearnLevel('intermediate')">🔬 Intermediate</button>
-                <button class="lvl-btn adv" onclick="setLearnLevel('advanced')">⚗️ Advanced</button>
-            </div>
-
-            <div id="topic-list" class="topic-list"></div>
-        </div>
-
-        <!-- PRACTICE TAB -->
-        <div id="practice" class="panel">
-            <h2>✏️ Practice Mode</h2>
-            
-            <div class="stats-row">
-                <div class="stat-card green"><div class="stat-num" id="p-correct">0</div><div>Correct</div></div>
-                <div class="stat-card blue"><div class="stat-num" id="p-total">0</div><div>Total</div></div>
-                <div class="stat-card orange"><div class="stat-num" id="p-streak">0</div><div>Streak</div></div>
-                <div class="stat-card purple"><div class="stat-num" id="p-acc">0%</div><div>Accuracy</div></div>
-            </div>
-
-            <div class="level-btns small">
-                <button class="lvl-btn basic active" onclick="setPracticeLevel('basic')">Basic</button>
-                <button class="lvl-btn inter" onclick="setPracticeLevel('intermediate')">Intermediate</button>
-                <button class="lvl-btn adv" onclick="setPracticeLevel('advanced')">Advanced</button>
-            </div>
-
-            <div id="practice-box" class="question-box"></div>
-        </div>
-
-        <!-- TEST TAB -->
-        <div id="test" class="panel">
-            <div id="test-setup">
-                <h2>📝 Take a Test</h2>
-                
-                <div class="setup-section">
-                    <label>Difficulty:</label>
-                    <div class="opt-btns">
-                        <button class="opt-btn active" onclick="setTestDiff(this,'basic')">Basic</button>
-                        <button class="opt-btn" onclick="setTestDiff(this,'intermediate')">Intermediate</button>
-                        <button class="opt-btn" onclick="setTestDiff(this,'advanced')">Advanced</button>
-                        <button class="opt-btn" onclick="setTestDiff(this,'mixed')">Mixed</button>
-                    </div>
-                </div>
-
-                <div class="setup-section">
-                    <label>Questions: <span id="q-count">10</span></label>
-                    <input type="range" id="q-slider" min="5" max="20" value="10" step="5" 
-                           oninput="document.getElementById('q-count').innerText=this.value">
-                </div>
-
-                <div class="setup-section">
-                    <label>Time Limit:</label>
-                    <div class="opt-btns">
-                        <button class="opt-btn" onclick="setTestTime(this,0)">None</button>
-                        <button class="opt-btn active" onclick="setTestTime(this,10)">10 min</button>
-                        <button class="opt-btn" onclick="setTestTime(this,15)">15 min</button>
-                        <button class="opt-btn" onclick="setTestTime(this,20)">20 min</button>
-                    </div>
-                </div>
-
-                <button class="big-btn" onclick="startTest()">🚀 Start Test</button>
-            </div>
-
-            <div id="test-active" style="display:none;">
-                <div class="test-top">
-                    <div class="timer" id="timer">10:00</div>
-                    <div class="progress-info">
-                        Question <b id="curr-q">1</b> / <b id="total-q">10</b>
-                        <div class="prog-bar"><div class="prog-fill" id="prog-fill"></div></div>
-                    </div>
-                </div>
-                <div id="test-box" class="question-box"></div>
-                <div class="nav-btns">
-                    <button onclick="testPrev()">← Prev</button>
-                    <button onclick="testNext()" id="next-btn">Next →</button>
-                    <button onclick="endTest()" id="finish-btn" style="display:none;">✓ Finish</button>
-                </div>
-            </div>
-
-            <div id="test-result" style="display:none;"></div>
-        </div>
-
-        <!-- CUSTOM TAB -->
-        <div id="custom" class="panel">
-            <h2>📁 Custom Quiz</h2>
-            <p>Load your own quiz from a JSON file</p>
-
-            <div class="custom-sections">
-                <div class="upload-area" id="upload-area" onclick="document.getElementById('file-inp').click()">
-                    <div style="font-size:3rem;">📄</div>
-                    <p><b>Click to upload JSON</b></p>
-                    <p>or drag & drop</p>
-                    <input type="file" id="file-inp" accept=".json" style="display:none;" onchange="loadFile(event)">
-                </div>
-
-                <div class="url-section">
-                    <h3>🔗 Load from URL</h3>
-                    <input type="text" id="url-inp" placeholder="Enter quiz URL...">
-                    <button onclick="loadURL()">Load</button>
-                    <div id="url-msg"></div>
-                </div>
-
-                <div class="server-section">
-                    <h3>⚙️ Server Quizzes</h3>
-                    <input type="text" id="base-url" placeholder="Base URL (optional)">
-                    <div class="add-row">
-                        <input type="text" id="sq-name" placeholder="Name">
-                        <input type="text" id="sq-path" placeholder="Path">
-                        <button onclick="addServerQuiz()">+</button>
-                    </div>
-                    <div id="server-list"></div>
-                </div>
-            </div>
-
-            <div class="library-section">
-                <h3>📚 Loaded Quizzes</h3>
-                <div id="quiz-lib">
-                    <p class="empty">No quizzes loaded</p>
-                </div>
-            </div>
-
-            <div id="custom-quiz-area" style="display:none;"></div>
-
-            <button class="help-float" onclick="showHelp()">?</button>
-        </div>
+<div class="app">
+    <div class="header">
+        <h1>🧪 Mole Calculations Master</h1>
+        <div class="score-box">Points: <span id="score">0</span></div>
     </div>
 
-    <!-- LESSON MODAL -->
-    <div id="lesson-modal" class="modal">
-        <div class="modal-content">
-            <span class="close-btn" onclick="closeLesson()">&times;</span>
-            <div id="lesson-body"></div>
-        </div>
+    <div class="tabs">
+        <button class="tab active" onclick="openTab(event, 'learn')">Learn</button>
+        <button class="tab" onclick="openTab(event, 'practice')">Practice</button>
+        <button class="tab" onclick="openTab(event, 'test')">Exam</button>
+        <button class="tab" onclick="openTab(event, 'custom')">Worksheets</button>
     </div>
 
-    <!-- HELP MODAL -->
-    <div id="help-modal" class="modal">
-        <div class="modal-content">
-            <span class="close-btn" onclick="closeHelp()">&times;</span>
-            <h2>📋 JSON Format</h2>
-            <pre>{
-  "title": "My Quiz",
-  "timeLimit": 10,
-  "questions": [
-    {
-      "type": "numeric",
-      "question": "Calculate moles in 36g H2O",
-      "answer": 2,
-      "unit": "mol",
-      "tolerance": 0.05,
-      "hint": "n = m/Mr",
-      "solution": "n = 36/18 = 2"
-    },
-    {
-      "type": "mcq",
-      "question": "Select correct answer",
-      "options": ["A","B","C","D"],
-      "answer": 0
-    }
-  ]
-}</pre>
+    <div id="learn" class="panel active">
+        <div class="level-btns">
+            <button class="lvl-btn basic active" onclick="setLearnLevel('basic')">Basic</button>
+            <button class="lvl-btn inter" onclick="setLearnLevel('intermediate')">Intermediate</button>
+            <button class="lvl-btn adv" onclick="setLearnLevel('advanced')">Advanced</button>
         </div>
+        <div id="topic-list" class="topic-list"></div>
     </div>
 
-    <script src="script.js"></script>
+    <div id="practice" class="panel">
+        <div class="stats-row">
+            <div class="stat-card blue">Streak<div id="streak" class="stat-num">0</div></div>
+            <div class="stat-card green">Correct<div id="p-correct" class="stat-num">0</div></div>
+            <div class="stat-card orange">Accuracy<div id="p-acc" class="stat-num">0%</div></div>
+        </div>
+        <div id="practice-box" class="question-box"></div>
+    </div>
+
+    <div id="custom" class="panel">
+        <h2>Import Worksheets</h2>
+        <p>Load JSON worksheets from your <code>/worksheets</code> folder or upload manually.</p>
+        <div class="custom-sections">
+            <div class="url-section">
+                <h3>Load from Subfolder</h3>
+                <input type="text" id="url-inp" placeholder="filename.json">
+                <button onclick="loadFromSubfolder()">Load Worksheet</button>
+                <div id="url-msg"></div>
+            </div>
+            <div id="upload-area" class="upload-area">
+                Drag & Drop JSON Worksheet Here
+            </div>
+        </div>
+        <div class="library-section">
+            <h3>Loaded Worksheets</h3>
+            <div id="quiz-lib"></div>
+        </div>
+    </div>
+</div>
+
+<div id="lesson-modal" class="modal">
+    <div class="modal-content">
+        <span class="close-btn" onclick="closeLesson()">×</span>
+        <div id="lesson-body"></div>
+    </div>
+</div>
+
+<script src="script.js"></script>
 </body>
 </html>
