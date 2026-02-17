@@ -1,43 +1,28 @@
-:root {
-    --bg: #0b0b18;
-    --card: #1c1c36;
-    --primary: #5850ec;
-    --accent: #a855f7;
-    --text: #f3f4f6;
-}
+:root { --bg: #0b0b18; --card: #1c1c36; --primary: #5850ec; --text: #f3f4f6; }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
-body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); }
-.app-shell { max-width: 1000px; margin: 0 auto; padding: 15px; }
+body { font-family: sans-serif; background: var(--bg); color: var(--text); padding: 10px; }
+.app-shell { max-width: 900px; margin: 0 auto; }
 
-/* HEADER */
-.main-header { background: linear-gradient(135deg, #4f46e5, #9333ea); padding: 25px; border-radius: 15px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-.stat-pill { background: rgba(0,0,0,0.25); padding: 6px 14px; border-radius: 20px; font-weight: bold; margin-bottom: 5px; }
+.main-header { background: linear-gradient(135deg, #4f46e5, #9333ea); padding: 20px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+.stat-pill { background: rgba(0,0,0,0.3); padding: 5px 12px; border-radius: 15px; font-size: 0.9rem; font-weight: bold; }
 
-/* NAV */
-.navigation-bar { display: flex; gap: 8px; margin-bottom: 20px; }
-.nav-btn { flex: 1; padding: 12px; border: none; background: var(--card); color: #9ca3af; border-radius: 10px; cursor: pointer; font-weight: 600; }
+.navigation-bar { display: flex; gap: 5px; margin-bottom: 15px; }
+.nav-btn { flex: 1; padding: 12px 5px; border: none; background: var(--card); color: #888; border-radius: 8px; cursor: pointer; font-size: 0.85rem; font-weight: 600; }
 .nav-btn.active { background: var(--primary); color: white; }
 
-/* TIER LINKS */
-.tier-switcher { display: flex; gap: 10px; margin-bottom: 20px; justify-content: center; }
-.tier-link { background: transparent; border: 1px solid #374151; color: #9ca3af; padding: 8px 16px; border-radius: 8px; cursor: pointer; }
-.tier-link.active { border-color: var(--primary); color: var(--primary); }
-
-/* GRID SYSTEM */
-.panel { display: none; min-height: 400px; }
+.panel { display: none; }
 .panel.active { display: block; }
-.cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
 
-/* ALIGNMENT FIX FOR QUIZ/PRACTICE */
-.centered-flow { display: flex; flex-direction: column; align-items: center; text-align: center; width: 100%; }
-.interactive-card { background: var(--card); padding: 30px; border-radius: 15px; width: 100%; max-width: 500px; text-align: left; }
+.tier-switcher { display: flex; gap: 8px; margin-bottom: 20px; justify-content: center; }
+.tier-link { background: transparent; border: 1px solid #444; color: #999; padding: 8px 12px; border-radius: 6px; cursor: pointer; }
+.tier-link.active { border-color: var(--primary); color: var(--primary); background: rgba(88, 80, 236, 0.1); }
 
-.quiz-setup { width: 100%; max-width: 400px; margin-bottom: 20px; }
-.quiz-input-group { display: flex; gap: 8px; margin-top: 10px; }
-.quiz-input-group input { flex: 2; padding: 12px; border-radius: 8px; border: 1px solid #374151; background: var(--bg); color: white; }
+.cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 15px; }
+.interactive-card { background: var(--card); padding: 20px; border-radius: 12px; width: 100%; max-width: 500px; margin: 0 auto; }
 
-/* BUTTONS */
-.btn-primary { background: var(--primary); color: white; border: none; padding: 12px 20px; border-radius: 10px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 10px; }
+.btn-primary { background: var(--primary); color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 10px; }
+.input-row { display: flex; gap: 10px; margin: 15px 0; align-items: center; }
+.input-row input, .quiz-input-group input { flex: 1; padding: 12px; border-radius: 6px; border: 1px solid #444; background: #000; color: white; }
 
-.input-field { width: 100%; padding: 12px; border-radius: 8px; background: var(--bg); border: 1px solid #374151; color: white; font-size: 1.1rem; margin: 15px 0; }
+.centered-flow { width: 100%; display: flex; justify-content: center; padding-top: 20px; }
