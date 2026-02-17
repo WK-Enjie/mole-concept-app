@@ -3,61 +3,60 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mole Master Pro</title>
+    <title>Mole Master | Stoichiometry Engine</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<div class="app-shell">
+<div class="app-wrapper">
     <header class="main-header">
         <div class="brand">
             <h1>🧪 Mole Master</h1>
-            <p>Advanced Chemistry Engine</p>
+            <p>Stoichiometry Engine</p>
         </div>
-        <div class="stats-hub">
-            <div class="stat-pill">Score: <span id="points">0</span></div>
-            <div class="stat-pill">Accuracy: <span id="accuracy">0%</span></div>
+        <div class="score-board">
+            <div class="stat">Points: <span id="points">0</span></div>
+            <div class="stat">Accuracy: <span id="accuracy">0%</span></div>
         </div>
     </header>
 
-    <nav class="navigation-bar">
-        <button class="nav-btn active" id="nav-learn" onclick="showPanel('learn-section')">Learning Hub</button>
-        <button class="nav-btn" id="nav-practice" onclick="showPanel('practice-section')">Randomized Practice</button>
-        <button class="nav-btn" id="nav-quiz" onclick="showPanel('quiz-section')">Quiz Mode</button>
+    <nav class="main-nav">
+        <button class="tab-btn active" onclick="navTo('learn-tab')">Learning Hub</button>
+        <button class="tab-btn" onclick="navTo('practice-tab')">Randomized Practice</button>
+        <button class="tab-btn" onclick="navTo('quiz-tab')">Quiz Mode</button>
     </nav>
 
-    <main class="content-container">
-        <section id="learn-section" class="panel active">
-            <div class="tier-switcher">
-                <button class="tier-link" onclick="updateTier('basic')">Basics</button>
-                <button class="tier-link" onclick="updateTier('intermediate')">Intermediate</button>
-                <button class="tier-link active" onclick="updateTier('advanced')">Advanced</button>
+    <main class="content-area">
+        <section id="learn-tab" class="panel active">
+            <div class="tier-nav">
+                <button class="tier-btn active" onclick="setTier('basic')">Basic</button>
+                <button class="tier-btn" onclick="setTier('advanced')">Advanced</button>
             </div>
-            <div id="learning-grid" class="cards-grid"></div>
+            <div id="topic-grid" class="grid-layout"></div>
         </section>
 
-        <section id="practice-section" class="panel">
-            <div class="centered-flow">
-                <div class="interactive-card">
-                    <h2 id="practice-title">Mixed Challenge</h2>
-                    <div id="practice-box-content">
-                        <p>Test your knowledge with randomized questions from all levels.</p>
-                        <button class="btn-primary" onclick="generateMegaRandomQuestion()">Generate Question</button>
+        <section id="practice-tab" class="panel">
+            <div class="center-container">
+                <div class="interaction-card">
+                    <h2 id="session-title">Randomized Practice</h2>
+                    <div id="question-display">
+                        <p>Click below to start a mixed-topic session.</p>
+                        <button class="cta-btn" onclick="generateQuestion('random')">Start Random Session</button>
                     </div>
                 </div>
             </div>
         </section>
 
-        <section id="quiz-section" class="panel">
-            <div class="centered-flow">
-                <div class="interactive-card">
-                    <h2>Load Custom Quiz</h2>
-                    <div class="quiz-input-group">
-                        <input type="text" id="quiz-file-input" placeholder="e.g. unit1_test">
-                        <button class="btn-primary" style="width:auto; margin:0;" onclick="fetchQuizJSON()">Start</button>
+        <section id="quiz-tab" class="panel">
+            <div class="center-container">
+                <div class="interaction-card">
+                    <h2>Load Quiz</h2>
+                    <div class="input-group">
+                        <input type="text" id="quiz-file" placeholder="Filename (e.g. molarity_test)">
+                        <button class="cta-btn" style="width:auto; margin:0;" onclick="loadQuiz()">Load</button>
                     </div>
-                    <p id="quiz-status-msg" style="margin-top:10px; font-size:0.9rem;"></p>
-                    <div id="active-quiz-area" style="display:none; margin-top:20px; border-top: 1px solid #374151; pt:20px;"></div>
+                    <p id="quiz-status" style="margin-top:10px; font-size:0.8rem;"></p>
+                    <div id="active-quiz" style="display:none; margin-top:20px; border-top: 1px solid #444; pt:20px;"></div>
                 </div>
             </div>
         </section>
