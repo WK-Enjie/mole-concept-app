@@ -3,70 +3,66 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mole Calculations Master</title>
+    <title>Mole Master | Chemistry Tutor</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <div class="app">
+        <header class="header">
+            <h1>🧪 Mole Master</h1>
+            <div class="score-box">Points: <span id="score">0</span></div>
+        </header>
 
-<div class="app">
-    <div class="header">
-        <h1>🧪 Mole Calculations Master</h1>
-        <div class="score-box">Points: <span id="score">0</span></div>
-    </div>
+        <nav class="tabs">
+            <button class="tab active" onclick="openTab(event, 'learn')">Learn</button>
+            <button class="tab" onclick="openTab(event, 'practice')">Practice</button>
+            <button class="tab" onclick="openTab(event, 'custom')">Worksheets</button>
+        </nav>
 
-    <div class="tabs">
-        <button class="tab active" onclick="openTab(event, 'learn')">Learn</button>
-        <button class="tab" onclick="openTab(event, 'practice')">Practice</button>
-        <button class="tab" onclick="openTab(event, 'test')">Exam</button>
-        <button class="tab" onclick="openTab(event, 'custom')">Worksheets</button>
-    </div>
-
-    <div id="learn" class="panel active">
-        <div class="level-btns">
-            <button class="lvl-btn basic active" onclick="setLearnLevel('basic')">Basic</button>
-            <button class="lvl-btn inter" onclick="setLearnLevel('intermediate')">Intermediate</button>
-            <button class="lvl-btn adv" onclick="setLearnLevel('advanced')">Advanced</button>
-        </div>
-        <div id="topic-list" class="topic-list"></div>
-    </div>
-
-    <div id="practice" class="panel">
-        <div class="stats-row">
-            <div class="stat-card blue">Streak<div id="streak" class="stat-num">0</div></div>
-            <div class="stat-card green">Correct<div id="p-correct" class="stat-num">0</div></div>
-            <div class="stat-card orange">Accuracy<div id="p-acc" class="stat-num">0%</div></div>
-        </div>
-        <div id="practice-box" class="question-box"></div>
-    </div>
-
-    <div id="custom" class="panel">
-        <h2>Import Worksheets</h2>
-        <p>Load JSON worksheets from your <code>/worksheets</code> folder or upload manually.</p>
-        <div class="custom-sections">
-            <div class="url-section">
-                <h3>Load from Subfolder</h3>
-                <input type="text" id="url-inp" placeholder="filename.json">
-                <button onclick="loadFromSubfolder()">Load Worksheet</button>
-                <div id="url-msg"></div>
+        <section id="learn" class="panel active">
+            <div class="level-btns">
+                <button class="lvl-btn basic active" onclick="setLvl('basic')">Basics</button>
+                <button class="lvl-btn inter" onclick="setLvl('intermediate')">Intermediate</button>
+                <button class="lvl-btn adv" onclick="setLvl('advanced')">Advanced</button>
             </div>
-            <div id="upload-area" class="upload-area">
-                Drag & Drop JSON Worksheet Here
+            <div id="topic-list" class="topic-list"></div>
+        </section>
+
+        <section id="practice" class="panel">
+            <div class="stats-row">
+                <div class="stat-card blue">Streak <span id="streak" class="stat-num">0</span></div>
+                <div class="stat-card green">Accuracy <span id="p-acc" class="stat-num">0%</span></div>
             </div>
-        </div>
-        <div class="library-section">
-            <h3>Loaded Worksheets</h3>
-            <div id="quiz-lib"></div>
+            <div id="practice-box" class="question-box">
+                <p>Select a topic from the Learn tab to start generating questions!</p>
+            </div>
+        </section>
+
+        <section id="custom" class="panel">
+            <h2>Worksheet Importer</h2>
+            <div class="custom-sections">
+                <div class="url-section">
+                    <h3>Subfolder Loader</h3>
+                    <input type="text" id="url-inp" placeholder="e.g., worksheet1.json">
+                    <button class="btn-primary" onclick="loadFromSubfolder()">Load from /worksheets</button>
+                    <div id="url-msg"></div>
+                </div>
+                <div id="upload-area" class="upload-area">Drag & Drop JSON here</div>
+            </div>
+            <div class="library-section">
+                <h3>Library</h3>
+                <div id="quiz-lib"></div>
+            </div>
+        </section>
+    </div>
+
+    <div id="lesson-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeLesson()">×</span>
+            <div id="lesson-body"></div>
         </div>
     </div>
-</div>
 
-<div id="lesson-modal" class="modal">
-    <div class="modal-content">
-        <span class="close-btn" onclick="closeLesson()">×</span>
-        <div id="lesson-body"></div>
-    </div>
-</div>
-
-<script src="script.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
