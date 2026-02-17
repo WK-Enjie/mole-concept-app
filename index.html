@@ -3,90 +3,152 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mole Master Pro</title>
+    <title>Mole Master Pro - O Level Chemistry</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
-<div class="app-container">
-    <header>
-        <div class="brand">
-            <h1>🧪 Mole Master</h1>
-            <p>Advanced Chemistry Practice</p>
-        </div>
-        <div class="stats-bar">
-            <div class="stat-pill">Score: <span id="score">0</span></div>
-            <div class="stat-pill">Streak: <span id="streak">0</span> 🔥</div>
-        </div>
-    </header>
-
-    <nav class="nav-bar">
-        <button id="nav-learn" class="nav-btn active">📚 Topics</button>
-        <button id="nav-random" class="nav-btn">🎲 Random</button>
-        <button id="nav-quiz" class="nav-btn">📝 Quiz Loader</button>
-    </nav>
-
-    <main>
-        <!-- TOPICS GRID -->
-        <section id="view-topics" class="active-view">
-            <div class="grid-container" id="topics-grid">
-                <!-- Injected via JS -->
+    <div class="app-container">
+        <header>
+            <div class="brand">
+                <span class="logo">🧪</span>
+                <div>
+                    <h1>Mole Master Pro</h1>
+                    <p class="subtitle">O Level Chemistry (6092) Excellence</p>
+                </div>
             </div>
+            <div class="stats-bar">
+                <div class="stat-pill">📊 <span id="score">0</span> pts</div>
+                <div class="stat-pill">🔥 <span id="streak">0</span> streak</div>
+                <div class="stat-pill">✅ <span id="accuracy">0%</span></div>
+            </div>
+        </header>
+
+        <nav class="nav-bar">
+            <button class="nav-btn active" id="nav-learn">📚 Topics</button>
+            <button class="nav-btn" id="nav-random">🎲 Random</button>
+            <button class="nav-btn" id="nav-quiz">📁 Load Quiz</button>
+        </nav>
+
+        <!-- TOPICS VIEW -->
+        <section id="view-topics" class="view">
+            <div class="section-header">
+                <h2>📚 Select a Topic</h2>
+                <p>Aligned with SEAB Syllabus 6092 - The Mole Concept & Stoichiometry</p>
+            </div>
+            <div class="grid-container" id="topics-grid"></div>
         </section>
 
-        <!-- PRACTICE INTERFACE -->
-        <section id="view-practice" class="hidden">
+        <!-- RANDOM PRACTICE VIEW (with Difficulty) -->
+        <section id="view-random" class="view hidden">
             <div class="card">
                 <div class="card-header">
-                    <h2 id="topic-title">Topic Title</h2>
-                    <button id="btn-exit" class="btn-text">Exit</button>
+                    <h3>🎲 Random Practice</h3>
+                    <button class="btn-text" id="btn-exit">✕ Exit</button>
                 </div>
 
-                <div class="question-meta">Question <span id="q-count">1</span></div>
-                
-                <div class="question-box">
-                    <p id="q-text">Loading...</p>
+                <!-- DIFFICULTY SELECTOR -->
+                <div class="difficulty-selector">
+                    <span class="diff-label">Difficulty:</span>
+                    <label class="diff-option">
+                        <input type="radio" name="difficulty" value="easy" checked>
+                        <span class="diff-tag easy">Easy</span>
+                    </label>
+                    <label class="diff-option">
+                        <input type="radio" name="difficulty" value="medium">
+                        <span class="diff-tag medium">Medium</span>
+                    </label>
+                    <label class="diff-option">
+                        <input type="radio" name="difficulty" value="hard">
+                        <span class="diff-tag hard">Hard</span>
+                    </label>
                 </div>
 
-                <div id="hint-box" class="hint-box hidden">
-                    <strong>💡 Hint:</strong> <span id="hint-text"></span>
+                <div class="progress-display">
+                    <span>Question:</span>
+                    <span id="q-count">1</span>
+                    <span class="divider">|</span>
+                    <span id="difficulty-badge" class="badge easy">Easy</span>
+                </div>
+
+                <div class="question-box" id="q-text">Loading...</div>
+
+                <div class="hint-box hidden" id="hint-box">
+                    <span class="hint-icon">💡</span>
+                    <span id="hint-text"></span>
                 </div>
 
                 <div class="input-area">
-                    <input type="number" id="user-input" placeholder="Answer..." step="any">
-                    <span id="unit-label" class="unit">mol</span>
+                    <input type="number" id="user-input" placeholder="Enter your answer..." step="0.001">
+                    <span class="unit" id="unit-label">mol</span>
                 </div>
 
-                <div id="feedback" class="feedback hidden"></div>
+                <div class="feedback hidden" id="feedback"></div>
 
-                <div id="solution-box" class="solution-box hidden">
-                    <h4>📝 Solution</h4>
+                <div class="solution-box hidden" id="solution-box">
+                    <h4>📝 Full Solution (O Level Format)</h4>
                     <div id="solution-content"></div>
+                    <div class="common-mistake" id="common-mistake"></div>
                 </div>
 
                 <div class="controls">
-                    <button id="btn-hint" class="btn-outline">Hint</button>
-                    <button id="btn-submit" class="btn-primary">Submit</button>
-                    <button id="btn-next" class="btn-secondary" disabled>Next →</button>
+                    <button class="btn-outline" id="btn-hint">💡 Hint</button>
+                    <button class="btn-primary" id="btn-submit">Submit</button>
+                    <button class="btn-secondary" id="btn-next" disabled>Next →</button>
                 </div>
             </div>
         </section>
 
-        <!-- QUIZ LOADER -->
-        <section id="view-quiz" class="hidden">
+        <!-- TOPIC PRACTICE VIEW -->
+        <section id="view-practice" class="view hidden">
             <div class="card">
-                <h2>Load Custom Quiz</h2>
-                <p class="desc">Load a JSON file from your computer/server.</p>
-                <div class="input-area">
-                    <input type="text" id="quiz-file" placeholder="filename (e.g., ions_test)">
-                    <button id="btn-load" class="btn-primary">Load</button>
+                <div class="card-header">
+                    <h3 id="topic-title">Topic Title</h3>
+                    <button class="btn-text" id="btn-exit-topic">✕ Exit</button>
                 </div>
-                <div id="quiz-status" class="status-msg"></div>
+                <div class="progress-display">
+                    <span>Question:</span>
+                    <span id="q-count-topic">1</span>
+                </div>
+                <div class="question-box" id="q-text-topic">Loading...</div>
+                <div class="hint-box hidden" id="hint-box-topic">
+                    <span class="hint-icon">💡</span>
+                    <span id="hint-text-topic"></span>
+                </div>
+                <div class="input-area">
+                    <input type="number" id="user-input-topic" placeholder="Enter your answer..." step="0.001">
+                    <span class="unit" id="unit-label-topic">mol</span>
+                </div>
+                <div class="feedback hidden" id="feedback-topic"></div>
+                <div class="solution-box hidden" id="solution-box-topic">
+                    <h4>📝 Full Solution (O Level Format)</h4>
+                    <div id="solution-content-topic"></div>
+                    <div class="common-mistake" id="common-mistake-topic"></div>
+                </div>
+                <div class="controls">
+                    <button class="btn-outline" id="btn-hint-topic">💡 Hint</button>
+                    <button class="btn-primary" id="btn-submit-topic">Submit</button>
+                    <button class="btn-secondary" id="btn-next-topic" disabled>Next →</button>
+                </div>
             </div>
         </section>
-    </main>
-</div>
 
-<script src="script.js"></script>
+        <!-- QUIZ LOADER VIEW -->
+        <section id="view-quiz" class="view hidden">
+            <div class="card">
+                <div class="card-header">
+                    <h3>📁 Load Custom Quiz</h3>
+                </div>
+                <p class="quiz-desc">Select a JSON quiz file to load custom questions.</p>
+                <div class="file-upload">
+                    <input type="file" id="quiz-file" accept=".json" class="hidden">
+                    <label for="quiz-file" class="upload-btn">📤 Choose File</label>
+                    <span id="file-name">No file selected</span>
+                </div>
+                <button class="btn-primary" id="btn-load-quiz">Load Quiz</button>
+            </div>
+        </section>
+    </div>
+
+    <script src="script.js"></script>
 </body>
 </html>
