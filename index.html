@@ -3,107 +3,85 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mole Master | Chemistry Practice</title>
+    <title>Mole Master Pro</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <div class="app-container">
-    <!-- Header -->
     <header>
         <div class="brand">
             <h1>🧪 Mole Master</h1>
-            <p>Stoichiometry & Moles Practice</p>
+            <p>Advanced Chemistry Practice</p>
         </div>
         <div class="stats-bar">
-            <div class="stat">Score: <span id="score">0</span></div>
-            <div class="stat">Streak: <span id="streak">0</span> 🔥</div>
+            <div class="stat-pill">Score: <span id="score">0</span></div>
+            <div class="stat-pill">Streak: <span id="streak">0</span> 🔥</div>
         </div>
     </header>
 
-    <!-- Navigation -->
     <nav class="nav-bar">
         <button id="nav-learn" class="nav-btn active">📚 Topics</button>
-        <button id="nav-random" class="nav-btn">🎲 Random Practice</button>
-        <button id="nav-quiz" class="nav-btn">📝 Load Quiz</button>
+        <button id="nav-random" class="nav-btn">🎲 Random</button>
+        <button id="nav-quiz" class="nav-btn">📝 Quiz Loader</button>
     </nav>
 
-    <!-- Main Content -->
     <main>
-        <!-- SECTION 1: TOPIC SELECTION -->
-        <section id="section-learn" class="active-section">
-            <h2 class="section-title">Select a Concept</h2>
-            <div id="topics-grid" class="grid-container">
-                <!-- Topics injected by JS -->
+        <!-- TOPICS GRID -->
+        <section id="view-topics" class="active-view">
+            <div class="grid-container" id="topics-grid">
+                <!-- Injected via JS -->
             </div>
         </section>
 
-        <!-- SECTION 2: PRACTICE AREA -->
-        <section id="section-practice" class="hidden">
+        <!-- PRACTICE INTERFACE -->
+        <section id="view-practice" class="hidden">
             <div class="card">
                 <div class="card-header">
-                    <h2 id="practice-mode-title">Practice</h2>
-                    <button id="btn-exit" class="btn-text">Exit to Menu</button>
+                    <h2 id="topic-title">Topic Title</h2>
+                    <button id="btn-exit" class="btn-text">Exit</button>
                 </div>
 
-                <div class="card-body">
-                    <p class="question-meta">Question <span id="q-counter">1</span></p>
-                    
-                    <div class="question-box">
-                        <p id="question-text">Loading question...</p>
-                    </div>
+                <div class="question-meta">Question <span id="q-count">1</span></div>
+                
+                <div class="question-box">
+                    <p id="q-text">Loading...</p>
+                </div>
 
-                    <div id="hint-box" class="hint-box hidden">
-                        <strong>💡 Hint:</strong> <span id="hint-text"></span>
-                    </div>
+                <div id="hint-box" class="hint-box hidden">
+                    <strong>💡 Hint:</strong> <span id="hint-text"></span>
+                </div>
 
-                    <div class="input-area">
-                        <input type="number" id="answer-input" placeholder="Enter numerical answer..." step="any">
-                        <span id="unit-label" class="unit">mol</span>
-                    </div>
+                <div class="input-area">
+                    <input type="number" id="user-input" placeholder="Answer..." step="any">
+                    <span id="unit-label" class="unit">mol</span>
+                </div>
 
-                    <div id="feedback" class="feedback hidden"></div>
-                    
-                    <div id="solution-box" class="solution-box hidden">
-                        <h4>Solution:</h4>
-                        <p id="solution-text"></p>
-                    </div>
+                <div id="feedback" class="feedback hidden"></div>
 
-                    <div class="controls">
-                        <button id="btn-hint" class="btn-outline">Show Hint</button>
-                        <button id="btn-submit" class="btn-primary">Submit Answer</button>
-                        <button id="btn-next" class="btn-secondary" disabled>Next Question</button>
-                    </div>
+                <div id="solution-box" class="solution-box hidden">
+                    <h4>📝 Solution</h4>
+                    <div id="solution-content"></div>
+                </div>
+
+                <div class="controls">
+                    <button id="btn-hint" class="btn-outline">Hint</button>
+                    <button id="btn-submit" class="btn-primary">Submit</button>
+                    <button id="btn-next" class="btn-secondary" disabled>Next →</button>
                 </div>
             </div>
         </section>
 
-        <!-- SECTION 3: QUIZ LOADER -->
-        <section id="section-quiz" class="hidden">
+        <!-- QUIZ LOADER -->
+        <section id="view-quiz" class="hidden">
             <div class="card">
                 <h2>Load Custom Quiz</h2>
-                <p class="desc">Enter the name of a JSON file located in your 'worksheets' folder.</p>
-                
+                <p class="desc">Load a JSON file from your computer/server.</p>
                 <div class="input-area">
-                    <input type="text" id="quiz-filename" placeholder="e.g. stoichiometry_test">
-                    <button id="btn-load-json" class="btn-primary">Load</button>
+                    <input type="text" id="quiz-file" placeholder="filename (e.g., ions_test)">
+                    <button id="btn-load" class="btn-primary">Load</button>
                 </div>
                 <div id="quiz-status" class="status-msg"></div>
-
-                <!-- Quiz Interface (Hidden by default) -->
-                <div id="quiz-interface" class="hidden">
-                    <hr>
-                    <div class="progress-bar"><div id="quiz-progress-fill" class="fill"></div></div>
-                    <p class="question-meta">Question <span id="quiz-q-num">1</span> of <span id="quiz-total"></span></p>
-                    <p id="quiz-q-text" class="question-text-quiz"></p>
-                    
-                    <div class="input-area">
-                        <input type="number" id="quiz-input" placeholder="Answer...">
-                        <span id="quiz-unit" class="unit"></span>
-                    </div>
-                    <div id="quiz-feedback" class="feedback hidden"></div>
-                    <button id="btn-quiz-submit" class="btn-primary full-width">Submit</button>
-                </div>
             </div>
         </section>
     </main>
