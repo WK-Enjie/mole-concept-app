@@ -1,154 +1,119 @@
 const CHEMICALS = [
-    { name: "NaOH", mr: 40 }, { name: "HCl", mr: 36.5 }, { name: "H₂SO₄", mr: 98 }, { name: "CaCO₃", mr: 100 }
+    { n: "NaOH", mr: 40 }, { n: "H₂SO₄", mr: 98 }, { n: "FeSO₄", mr: 152 }, { n: "KMnO₄", mr: 158 }
 ];
 
-const TOPICS_DATA = {
+const TOPICS = {
     basic: [
-        { id: 'mass', title: 'Mass & Mr', desc: 'n = m / Mr' },
-        { id: 'gas', title: 'Gas Volume', desc: 'n = V / 24' }
-    ],
-    intermediate: [
-        { id: 'yield', title: '% Yield', desc: 'Efficiency' },
-        { id: 'emp', title: 'Empirical', desc: 'Ratios' }
+        { id: 'mass', title: 'Mass & Mr', desc: 'n = mass / Mr' },
+        { id: 'gas', title: 'Gas Volume', desc: 'n = Vol / 24 (RTP)' },
+        { id: 'conc', title: 'Concentration', desc: 'n = c × V' }
     ],
     advanced: [
-        { id: 'titrate', title: 'Titration', desc: 'Neutralization' },
-        { id: 'redox', title: 'Redox', desc: 'Oxidation States' }
+        { id: 'limit', title: 'Limiting & Excess', desc: 'Reactant stoichiometry' },
+        { id: 'redox', title: 'Ions & Redox', desc: 'Mole ratios in Redox' },
+        { id: 'titrate', title: 'Titration', desc: 'Acid-Base calculations' }
     ]
 };
 
 let currentAns = null;
 let stats = { pts: 0, tries: 0, hits: 0 };
-let quizQs = [], quizIdx = 0;
+let currentSessionTopic = 'random';
 
-// 1. Tab Navigation
-function showPanel(panelId) {
+function navTo(id) {
     document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-    
-    document.getElementById(panelId).classList.add('active');
-    
-    // Highlight correct button
-    if(panelId === 'learn-section') document.getElementById('nav-learn').classList.add('active');
-    if(panelId === 'practice-section') document.getElementById('nav-practice').classList.add('active');
-    if(panelId === 'quiz-section') document.getElementById('nav-quiz').classList.add('active');
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    event.currentTarget.classList.add('active');
+    if(id === 'learn-tab') renderGrid('basic');
 }
 
-// 2. Learning Hub Logic
-function updateTier(tier) {
-    document.querySelectorAll('.tier-link').forEach(l => l.classList.remove('active'));
-    event.target.classList.add('active');
-    
-    const grid = document.getElementById('learning-grid');
-    grid.innerHTML = TOPICS_DATA[tier].map(t => `
-        <div class="interactive-card">
+function setTier(tier) {
+    document.querySelectorAll('.tier-btn').forEach(b => b.classList.remove('active'));
+    event.currentTarget.classList.add('active');
+    renderGrid(tier);
+}
+
+function renderGrid(tier) {
+    const grid = document.getElementById('topic-grid');
+    grid.innerHTML = TOPICS[tier].map(t => `
+        <div class="interaction-card">
             <h3>${t.title}</h3>
             <p>${t.desc}</p>
-            <button class="btn-primary" onclick="startSpecificPractice('${t.id}')">Practice This</button>
+            <button class="cta-btn" onclick="startLearning('${t.id}', '${t.title}')">Learn & Practice</button>
         </div>
     `).join('');
 }
 
-function startSpecificPractice(id) {
-    showPanel('practice-section');
-    generateLogic(id);
+function startLearning(id, title) {
+    navTo('practice-tab');
+    document.getElementById('session-title').innerText = title;
+    generateQuestion(id);
 }
 
-// 3. Question Logic
-function generateMegaRandomQuestion() {
-    const ids = ['mass', 'gas', 'titrate', 'redox'];
-    const randomId = ids[Math.floor(Math.random() * ids.length)];
-    generateLogic(randomId);
-}
+[attachment_0](attachment)
 
-
-
-function generateLogic(id) {
-    const display = document.getElementById('practice-box-content');
-    let q = ""; let unit = ""; let isText = false;
+function generateQuestion(id) {
+    const display = document.getElementById('question-display');
+    currentSessionTopic = id;
+    let q = ""; let unit = "";
     const chem = CHEMICALS[Math.floor(Math.random()*CHEMICALS.length)];
 
-    if(id === 'titrate') {
-        const v2 = (Math.random()*10 + 20).toFixed(1);
-        q = `25cm³ of 0.1M HCl neutralizes ${v2}cm³ of NaOH. Find [NaOH].`;
-        currentAns = (2.5 / v2).toFixed(3); unit = "M";
-    } else if(id === 'redox') {
-        q = `Oxidation state of Mn in MnO₄⁻?`;
-        currentAns = "+7"; unit = ""; isText = true;
-    } else if(id === 'gas') {
-        const v = (Math.random()*12 + 1).toFixed(1);
-        q = `Moles in ${v}dm³ of gas at RTP?`;
-        currentAns = (v/24).toFixed(2); unit = "mol";
-    } else {
+    // Target specific logic based on the ID
+    const type = (id === 'random') ? ['mass', 'gas', 'conc', 'limit', 'redox', 'titrate'][Math.floor(Math.random()*6)] : id;
+
+    if(type === 'mass') {
         const m = (Math.random()*20 + 2).toFixed(1);
-        q = `Moles in ${m}g of ${chem.name} (Mr=${chem.mr})?`;
+        q = `How many moles are in ${m}g of ${chem.n} (Mr=${chem.mr})?`;
         currentAns = (m/chem.mr).toFixed(2); unit = "mol";
+    } else if(type === 'gas') {
+        const v = (Math.random()*12 + 1).toFixed(1);
+        q = `What is the amount in moles of ${v}dm³ of CO₂ at RTP?`;
+        currentAns = (v/24).toFixed(2); unit = "mol";
+    } else if(type === 'conc') {
+        const c = 0.5; const v = 250;
+        q = `Calculate moles of solute in 250cm³ of a 0.5M solution.`;
+        currentAns = 0.125; unit = "mol";
+    } else if(type === 'redox') {
+        const mol = 0.02;
+        q = `In a redox reaction, 1 mol of MnO₄⁻ reacts with 5 mol of Fe²⁺. If you have 0.02 mol of MnO₄⁻, how many moles of Fe²⁺ react?`;
+        currentAns = 0.10; unit = "mol";
+    } else if(type === 'titrate') {
+        q = `25cm³ of 0.1M HCl reacts with 20cm³ of NaOH. Find [NaOH].`;
+        currentAns = 0.125; unit = "M";
+    } else {
+        q = `2 mol of H₂ reacts with 1 mol of O₂. If you have 4 mol of H₂ and 1 mol of O₂, which is limiting? (Enter 1 for H₂, 2 for O₂)`;
+        currentAns = 2; unit = "ID";
     }
 
     display.innerHTML = `
-        <p style="font-size:1.1rem; margin-bottom:10px;">${q}</p>
-        <div class="input-row">
-            <input type="${isText?'text':'number'}" id="user-input-ans">
-            <span style="color:#a855f7; font-weight:bold">${unit}</span>
-        </div>
-        <div id="feedback-msg" style="height:20px; margin-bottom:10px;"></div>
-        <button class="btn-primary" onclick="checkAnswer('${id}')">Submit Answer</button>
+        <p style="font-size:1.1rem; line-height:1.4;">${q}</p>
+        <input type="number" id="ans-box" class="ans-input" placeholder="Answer...">
+        <div id="fb" style="height:20px; margin-bottom:10px; font-weight:bold;"></div>
+        <button class="cta-btn" onclick="checkAns()">Check Answer</button>
     `;
 }
 
-
-
-function checkAnswer(id) {
-    const userVal = document.getElementById('user-input-ans').value.trim();
-    const fb = document.getElementById('feedback-msg');
-    let isCorrect = (userVal == currentAns || Math.abs(userVal - currentAns) < 0.02);
+function checkAns() {
+    const val = document.getElementById('ans-box').value;
+    const isCorrect = (Math.abs(parseFloat(val) - parseFloat(currentAns)) < 0.01);
+    const fb = document.getElementById('fb');
 
     stats.tries++;
     if(isCorrect) {
         stats.pts += 10; stats.hits++;
-        fb.innerHTML = "<span style='color:green'>✅ Correct!</span>";
-        setTimeout(() => generateLogic(id), 1000);
+        fb.innerHTML = "<span style='color:#22c55e'>✅ Correct!</span>";
+        setTimeout(() => generateQuestion(currentSessionTopic), 1200);
     } else {
-        fb.innerHTML = `<span style='color:red'>❌ Wrong. Answer: ${currentAns}</span>`;
+        fb.innerHTML = `<span style='color:#ef4444'>❌ Wrong. Answer: ${currentAns}</span>`;
     }
-    updateStats();
+    updateScore();
 }
 
-function updateStats() {
+function updateScore() {
     document.getElementById('points').innerText = stats.pts;
     const acc = stats.tries ? Math.round((stats.hits/stats.tries)*100) : 0;
     document.getElementById('accuracy').innerText = acc + "%";
 }
 
-// 4. Quiz Logic
-async function fetchQuizJSON() {
-    const filename = document.getElementById('quiz-file-input').value;
-    const status = document.getElementById('quiz-status-msg');
-    try {
-        const res = await fetch(`./worksheets/${filename}.json`);
-        const data = await res.json();
-        quizQs = data.questions; quizIdx = 0;
-        status.innerText = "✅ Quiz Loaded Successfully";
-        renderQuizStep();
-    } catch(e) { status.innerText = "❌ File not found in /worksheets/"; }
-}
-
-function renderQuizStep() {
-    const area = document.getElementById('active-quiz-area');
-    area.style.display = 'block';
-    const q = quizQs[quizIdx];
-    area.innerHTML = `
-        <p><b>Question ${quizIdx+1}:</b> ${q.question}</p>
-        <input id="q-ans-input" class="btn-primary" style="background:#000; text-align:left; cursor:text;">
-        <button class="btn-primary" onclick="nextQuizStep()">Next Question</button>
-    `;
-}
-
-function nextQuizStep() {
-    quizIdx++;
-    if(quizIdx < quizQs.length) renderQuizStep();
-    else document.getElementById('active-quiz-area').innerHTML = "<h3>Quiz Complete!</h3>";
-}
-
-// Initialize
-updateTier('advanced');
+// Start-up
+renderGrid('basic');
