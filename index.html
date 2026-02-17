@@ -16,74 +16,97 @@
         </div>
         <div class="stats-panel">
             <div class="stat-badge">Score: <span id="score">0</span></div>
+            <div class="stat-badge">Streak: <span id="streak">0</span>🔥</div>
             <div class="stat-badge">Accuracy: <span id="accuracy">0%</span></div>
         </div>
     </header>
 
     <nav class="nav-bar">
-        <button class="nav-btn active" onclick="switchTab('learn')">Learning Hub</button>
-        <button class="nav-btn" onclick="switchTab('practice')">Randomized Practice</button>
-        <button class="nav-btn" onclick="switchTab('quiz')">Quiz Mode</button>
+        <button class="nav-btn active" data-tab="learn">📚 Learning Hub</button>
+        <button class="nav-btn" data-tab="practice">🎲 Random Practice</button>
+        <button class="nav-btn" data-tab="quiz">📝 Quiz Mode</button>
     </nav>
 
     <main class="content-area">
         
+        <!-- LEARNING HUB -->
         <section id="learn" class="tab-content active">
             <h2 class="section-title">Select a Concept to Master</h2>
-            <div class="topics-grid" id="topics-container">
-                </div>
+            <div class="topics-grid" id="topics-container"></div>
         </section>
 
+        <!-- PRACTICE MODE -->
         <section id="practice" class="tab-content">
             <div class="center-stage">
                 <div class="question-card">
                     <div class="card-header">
                         <h3 id="mode-title">Practice Mode</h3>
-                        <button class="close-btn" onclick="switchTab('learn')">Back to Hub</button>
+                        <span class="topic-tag" id="topic-tag">Loading...</span>
                     </div>
                     
                     <div class="question-body">
-                        <p id="q-text" class="q-text">Press Start to begin.</p>
+                        <div class="question-number">Question <span id="q-number">1</span></div>
+                        <p id="q-text" class="q-text">Loading question...</p>
+                        
+                        <div class="hint-box" id="hint-box" style="display:none;">
+                            <strong>💡 Hint:</strong> <span id="hint-text"></span>
+                        </div>
                         
                         <div class="input-wrapper">
-                            <input type="number" id="user-input" placeholder="Enter numerical answer...">
+                            <input type="number" step="any" id="user-input" placeholder="Enter your answer...">
                             <span id="unit-display" class="unit-tag">mol</span>
                         </div>
 
                         <div id="feedback-area" class="feedback-msg"></div>
+                        <div id="solution-area" class="solution-box" style="display:none;"></div>
 
                         <div class="action-buttons">
-                            <button class="btn primary" onclick="checkAnswer()">Submit Answer</button>
-                            <button class="btn secondary" onclick="nextQuestion()">Next Question</button>
+                            <button class="btn hint-btn" id="hint-btn">💡 Hint</button>
+                            <button class="btn primary" id="submit-btn">Submit Answer</button>
+                            <button class="btn secondary" id="next-btn">Next Question →</button>
                         </div>
+                        
+                        <button class="btn back-btn" id="back-btn">← Back to Hub</button>
                     </div>
                 </div>
             </div>
         </section>
 
+        <!-- QUIZ MODE -->
         <section id="quiz" class="tab-content">
             <div class="center-stage">
                 <div class="question-card">
-                    <h3>Load Custom Quiz</h3>
-                    <p class="desc">Enter the filename of a .json file stored in your 'worksheets' folder.</p>
+                    <h3>📋 Custom Quiz Loader</h3>
+                    <p class="desc">Load a JSON file with custom questions from your worksheets folder.</p>
                     
                     <div class="input-wrapper" style="margin-top:15px;">
-                        <input type="text" id="quiz-filename" placeholder="e.g. stoichiometry_test">
-                        <button class="btn primary" style="width:auto;" onclick="loadQuiz()">Load</button>
+                        <input type="text" id="quiz-filename" placeholder="e.g. chapter5_test">
+                        <button class="btn primary" style="width:auto;" id="load-quiz-btn">Load</button>
                     </div>
                     <p id="quiz-status" class="status-msg"></p>
 
-                    <div id="quiz-display" style="display:none; border-top:1px solid #333; margin-top:20px; padding-top:20px;">
-                        <h4 id="quiz-q-num">Question 1</h4>
+                    <div id="quiz-display" style="display:none;">
+                        <div class="quiz-progress">
+                            <span id="quiz-progress-text">Question 1 of 10</span>
+                            <div class="progress-bar"><div class="progress-fill" id="quiz-progress-bar"></div></div>
+                        </div>
                         <p id="quiz-q-text" class="q-text"></p>
-                        <input id="quiz-input" class="input-box" placeholder="Your answer...">
-                        <button class="btn primary" style="margin-top:10px;" onclick="nextQuizQuestion()">Next</button>
+                        <div class="input-wrapper">
+                            <input type="number" step="any" id="quiz-input" placeholder="Your answer...">
+                            <span id="quiz-unit" class="unit-tag"></span>
+                        </div>
+                        <div id="quiz-feedback" class="feedback-msg"></div>
+                        <button class="btn primary" style="margin-top:10px;" id="quiz-next-btn">Submit & Next</button>
                     </div>
                 </div>
             </div>
         </section>
 
     </main>
+    
+    <footer class="app-footer">
+        <p>Mole Master Pro • Chemistry Made Easy</p>
+    </footer>
 </div>
 
 <script src="script.js"></script>
